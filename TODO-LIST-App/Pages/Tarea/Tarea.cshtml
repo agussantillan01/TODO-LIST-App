@@ -1,0 +1,40 @@
+﻿@page
+@model TODO_LIST_App.Pages.Tarea.TareaModel
+@{
+    ViewData["Title"] = "Lista de Tareas";
+}
+
+<h2>Lista de Tareas</h2>
+
+<form method="post">
+    <div>
+        <label for="nombreTarea">Nueva Tarea:</label>
+        <input type="text" id="nombreTarea" asp-for="NuevaTarea.Nombre" required />
+        <button type="submit">Agregar</button>
+    </div>
+</form>
+
+@if (Model.Tareas.Any())
+{
+    <ul>
+        @foreach (var tarea in Model.Tareas)
+        {
+            <li>
+                <form method="post">
+                    <input type="hidden" name="id" value="@tarea.Id" />
+                    <input type="checkbox" onchange="this.form.submit()" asp-for="@tarea.Completado" />
+                    <span style="@(tarea.Completado ? "text-decoration: line-through;" : "")">@tarea.Nombre</span>
+                </form>
+
+                <form method="post">
+                    <input type="hidden" name="id" value="@tarea.Id" />
+                    <button type="submit" asp-page-handler="Eliminar">❌</button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No hay tareas pendientes.</p>
+}
