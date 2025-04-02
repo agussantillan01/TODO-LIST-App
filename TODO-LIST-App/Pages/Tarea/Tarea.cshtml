@@ -4,37 +4,66 @@
     ViewData["Title"] = "Lista de Tareas";
 }
 
-<h2>Lista de Tareas</h2>
+<div class="container mt-3">
+    <h2 class="text-center mb-3">Lista de Tareas</h2>
 
-<form method="post">
-    <div>
-        <label for="nombreTarea">Nueva Tarea:</label>
-        <input type="text" id="nombreTarea" asp-for="NuevaTarea.Nombre" required />
-        <button type="submit">Agregar</button>
-    </div>
-</form>
+    @if (TempData["MensajeAlerta"] != null)
+    {
+        <div class="alert alert-@TempData["TipoAlerta"]">
+            @TempData["MensajeAlerta"]
+        </div>
+    }
 
-@if (Model.Tareas.Any())
-{
-    <ul>
-        @foreach (var tarea in Model.Tareas)
-        {
-            <li>
-                <form method="post">
-                    <input type="hidden" name="id" value="@tarea.Id" />
-                    <input type="checkbox" onchange="this.form.submit()" asp-for="@tarea.Completado" />
-                    <span style="@(tarea.Completado ? "text-decoration: line-through;" : "")">@tarea.Nombre</span>
-                </form>
+    <form method="post" class="mb-4">
+        <div class="input-group">
+            <input type="text" asp-for="NuevaTarea.Nombre" class="form-control"
+                   placeholder="Ingrese una nueva tarea..." required />
+            <button type="submit" class="btn btn-primary">Agregar</button>
+        </div>
+    </form>
 
-                <form method="post">
-                    <input type="hidden" name="id" value="@tarea.Id" />
-                    <button type="submit" asp-page-handler="Eliminar">❌</button>
-                </form>
-            </li>
-        }
-    </ul>
-}
-else
-{
-    <p>No hay tareas pendientes.</p>
-}
+    @if (Model.Tareas.Any())
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Tarea</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tarea in Model.Tareas)
+                {
+                    <tr style="@(tarea.Completado ? "background-color:#e8f5e9;" : "")">
+                        <td style="@(tarea.Completado ? "text-decoration:line-through;" : "")">
+                            @tarea.Nombre
+                        </td>
+                        <td>
+                            <form method="post" asp-page-handler="Toggle">
+                                <input type="hidden" name="id" value="@tarea.Id" />
+                                <input type="checkbox" name="completado" value="true"
+                                @(tarea.Completado ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <input type="hidden" name="completado" value="false" />
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" asp-page-handler="Eliminar"
+                                  onsubmit="return confirm('¿Eliminar esta tarea?');">
+                                <input type="hidden" name="id" value="@tarea.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            No hay tareas. ¡Agrega una!
+        </div>
+    }
+</div>
